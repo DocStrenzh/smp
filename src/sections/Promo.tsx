@@ -7,7 +7,7 @@ const PromotionsSection: React.FC = () => {
       <div className="mx-auto max-w-6xl px-4">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-3xl font-semibold text-gray-900">Акции</h2>
-          <button className="text-xs font-semibold uppercase tracking-wide text-lime-400 hover:text-lime-500">
+          <button className="text-xs font-semibold font-AppFont uppercase tracking-wide text-lime-400 hover:text-lime-500">
             все акции
           </button>
         </div>

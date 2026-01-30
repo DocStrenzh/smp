@@ -176,9 +176,12 @@ const QuickActionsPanel: React.FC = () => {
   const [rPhoto, setRPhoto] = useState<File | null>(null);
 
   const mapConstructorId =
-    "03eeb9515b57dab189fdbb8ae21360379bb50ed4a9de62316915ef081ce01bea";
+    "3841c843ec0107c8579967f19fb2eb1cb2e481f0ae5f08f418a32562a68e991d";
+
   const mapWidgetSrc = `https://yandex.ru/map-widget/v1/?um=constructor%3A${mapConstructorId}&source=constructor`;
+
   const mapOpenUrl = "https://yandex.ru/maps/";
+
 
   const submitCallback = async () => {
     resetAlerts();

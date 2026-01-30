@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuickActions } from "../components/QuickActionProvider";
 
@@ -31,7 +31,13 @@ const ServiceListLayout: React.FC<ServiceListLayoutProps> = ({
                                                              }) => {
   const { openAction } = useQuickActions();
 
-  const [activeServiceId, setActiveServiceId] = useState<string>(services[0]?.id ?? "");
+  const [activeServiceId, setActiveServiceId] = useState<string>("");
+
+  useEffect(() => {
+    if (!activeServiceId && services.length > 0) {
+      setActiveServiceId(services[0].id);
+    }
+  }, [services, activeServiceId]);
 
   const handleServiceClick = (id: string) => {
     setActiveServiceId(id);
@@ -72,7 +78,7 @@ const ServiceListLayout: React.FC<ServiceListLayoutProps> = ({
                     type="button"
                     onClick={() => handleServiceClick(service.id)}
                     className={[
-                      "block w-full px-5 py-4 text-left text-sm transition",
+                      "block w-full px-5 py-4 font-AppFont text-left text-sm transition",
                       isActive
                         ? "bg-lime-400 font-semibold text-black"
                         : "bg-white text-gray-800 hover:bg-gray-50",
@@ -92,7 +98,7 @@ const ServiceListLayout: React.FC<ServiceListLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => openAction("callback")}
-                className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+                className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
               >
                 <span className="text-lg">📞</span>
                 <span>Заказать звонок</span>
@@ -110,7 +116,7 @@ const ServiceListLayout: React.FC<ServiceListLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => openAction("review")}
-                className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+                className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
               >
                 <span className="text-lg">💬</span>
                 <span>Оставить отзыв</span>
@@ -119,7 +125,7 @@ const ServiceListLayout: React.FC<ServiceListLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => openAction("map")}
-                className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+                className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
               >
                 <span className="text-lg">📍</span>
                 <span>Ближайшая студия</span>
@@ -145,7 +151,7 @@ const ServiceListLayout: React.FC<ServiceListLayoutProps> = ({
                   <div className="md:w-1/3">
                     <img src={service.image} alt={service.name} className="h-full w-full object-cover" />
                   </div>
-                  <div className="flex flex-1 items-center px-6 py-6 text-base text-gray-900">
+                  <div className="flex flex-1 items-center px-6 py-6 font-AppFont text-base text-gray-900">
                     {service.name}
                   </div>
                 </Link>

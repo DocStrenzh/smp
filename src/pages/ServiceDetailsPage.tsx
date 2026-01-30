@@ -7,9 +7,11 @@ import type { ServiceProduct } from "../constants/serviceProducts";
 
 const VISIBLE_COUNT = 3;
 
+// Если где-то в роутинге/старых ссылках встречается "metal" — приведём к slug из бэка
 const normalizeSlug = (s?: string) => {
   if (!s) return "";
-  return s === "metal" ? "metall" : s;
+  if (s === "metal") return "metall";
+  return s;
 };
 
 type ApiSectionListItem = {
@@ -20,6 +22,7 @@ type ApiSectionListItem = {
   image: string;
   hasGallery: boolean;
   hasCatalog: boolean;
+  sortOrder?: number; // на будущее (если добавят)
 };
 
 type ApiSectionListResponse = {
@@ -95,6 +98,11 @@ const ServiceDetailsPage: React.FC = () => {
   const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
+    setLightboxIndex(null);
+    setStartIndex(0);
+  }, [apiSlug]);
+
+  useEffect(() => {
     let mounted = true;
 
     const load = async () => {
@@ -111,8 +119,8 @@ const ServiceDetailsPage: React.FC = () => {
         const safeSlug = encodeURIComponent(apiSlug);
 
         const [listRes, detailsRes] = await Promise.all([
-          http.get<ApiSectionListResponse>("/sections/"),
-          http.get<ApiSectionDetails>(`/sections/${safeSlug}/`),
+          http.get<ApiSectionListResponse>("/sections"),
+          http.get<ApiSectionDetails>(`/sections/${safeSlug}`),
         ]);
 
         if (!mounted) return;
@@ -149,6 +157,7 @@ const ServiceDetailsPage: React.FC = () => {
   const introParagraphs: string[] = useMemo(() => {
     const text = (details?.advantegesText ?? "").trim();
     if (!text) return [];
+
     return text
       .split(/\n\s*\n|\\n\\n|\r\n\r\n/g)
       .map((p) => p.trim())
@@ -201,13 +210,10 @@ const ServiceDetailsPage: React.FC = () => {
         })
         .filter(Boolean);
 
-      const badges = (it.badges ?? [])
-        .map((b) => (b ?? "").trim())
-        .filter(Boolean);
-
+      const badges = (it.badges ?? []).map((b) => (b ?? "").trim()).filter(Boolean);
       const shortSpecs = badges.length ? [...badges, ...specs] : specs;
 
-      const mapped: ServiceProduct = {
+      return {
         id: it.id,
         serviceSlug: details.slug,
         category: categoryTitle,
@@ -216,10 +222,19 @@ const ServiceDetailsPage: React.FC = () => {
         priceRub: it.priceRub,
         shortSpecs,
       };
-
-      return mapped;
     });
   }, [details]);
+
+  const sidebarSections = useMemo(() => {
+    const copy = [...sections];
+    copy.sort((a, b) => {
+      const sa = a.sortOrder ?? 999;
+      const sb = b.sortOrder ?? 999;
+      if (sa !== sb) return sa - sb;
+      return (a.label || a.title).localeCompare(b.label || b.title, "ru");
+    });
+    return copy;
+  }, [sections]);
 
   const openLightbox = (index: number) => {
     if (!gallery.length) return;
@@ -252,6 +267,7 @@ const ServiceDetailsPage: React.FC = () => {
   const visibleImages = useMemo(() => {
     if (!gallery.length) return [] as { img: UiGalleryItem; index: number }[];
     const count = Math.min(VISIBLE_COUNT, gallery.length);
+
     const result: { img: UiGalleryItem; index: number }[] = [];
     for (let i = 0; i < count; i += 1) {
       const idx = (startIndex + i) % gallery.length;
@@ -259,16 +275,6 @@ const ServiceDetailsPage: React.FC = () => {
     }
     return result;
   }, [gallery, startIndex]);
-
-  const sidebarSections = useMemo(() => {
-    const order: Record<string, number> = { metall: 1, bsu: 2, bps: 3 };
-    return [...sections].sort((a, b) => {
-      const ra = order[a.slug] ?? 999;
-      const rb = order[b.slug] ?? 999;
-      if (ra !== rb) return ra - rb;
-      return (a.label || a.title).localeCompare(b.label || b.title, "ru");
-    });
-  }, [sections]);
 
   if (loading) {
     return (
@@ -317,7 +323,7 @@ const ServiceDetailsPage: React.FC = () => {
         <div className="absolute inset-0 bg-white/40" />
 
         <div className="absolute inset-0 flex max-w-5xl flex-col justify-center px-6 md:px-16">
-          <h1 className="mb-10 text-3xl font-semibold text-gray-900 md:text-4xl">
+          <h1 className="mb-10 text-3xl font-AppFont font-semibold text-gray-900 md:text-4xl">
             {serviceTitle}
           </h1>
 
@@ -325,7 +331,7 @@ const ServiceDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => openAction("callback")}
-              className="bg-lime-400 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
+              className="bg-lime-400 px-8 py-3 text-sm font-semibold font-AppFont uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
             >
               Заказать услугу
             </button>
@@ -333,7 +339,7 @@ const ServiceDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => openAction("question")}
-              className="bg-lime-400 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
+              className="bg-lime-400 px-8 py-3 text-sm font-semibold font-AppFont uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
             >
               Задать вопрос
             </button>
@@ -357,21 +363,25 @@ const ServiceDetailsPage: React.FC = () => {
                       : "bg-white text-gray-800 hover:bg-gray-50",
                   ].join(" ")}
                 >
-                  {s.label}
+                  {s.label || s.title}
                 </Link>
               );
             })}
           </div>
 
           <div className="overflow-hidden border border-gray-200 bg-white">
-            <img src="/images/support.jpg" alt="Мы всегда на связи" className="w-full object-cover" />
+            <img
+              src="/images/support.jpg"
+              alt="Мы всегда на связи"
+              className="w-full object-cover"
+            />
           </div>
 
           <div className="space-y-1">
             <button
               type="button"
               onClick={() => openAction("callback")}
-              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
             >
               <span className="text-lg">📞</span>
               <span>Заказать звонок</span>
@@ -380,7 +390,7 @@ const ServiceDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => openAction("question")}
-              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
             >
               <span className="text-lg">✉️</span>
               <span>Написать сообщение</span>
@@ -389,7 +399,7 @@ const ServiceDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => openAction("review")}
-              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
             >
               <span className="text-lg">💬</span>
               <span>Оставить отзыв</span>
@@ -398,7 +408,7 @@ const ServiceDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => openAction("map")}
-              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 text-left text-sm hover:bg-gray-50"
+              className="flex w-full items-center gap-3 border border-gray-200 bg-white px-5 py-4 font-AppFont text-left text-sm hover:bg-gray-50"
             >
               <span className="text-lg">📍</span>
               <span>Ближайшая студия</span>
@@ -417,7 +427,9 @@ const ServiceDetailsPage: React.FC = () => {
 
           {advantages.length > 0 && (
             <div>
-              <h2 className="mb-4 text-xl font-semibold">Преимущества {serviceLabel}</h2>
+              <h2 className="mb-4 text-xl font-semibold font-AppFont">
+                Преимущества {serviceLabel || serviceTitle}
+              </h2>
               <ul className="ml-5 list-disc space-y-2 text-sm text-gray-800">
                 {advantages.map((adv, idx) => (
                   <li key={`${idx}-${adv}`}>{adv}</li>
@@ -429,10 +441,7 @@ const ServiceDetailsPage: React.FC = () => {
           {products.length > 0 && (
             <ServiceProductsCatalog
               products={products}
-              onConsult={(product) => {
-                void product;
-                openAction("callback");
-              }}
+              onConsult={() => openAction("callback")}
             />
           )}
 
@@ -488,7 +497,7 @@ const ServiceDetailsPage: React.FC = () => {
           <div className="pt-4">
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 bg-lime-400 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-black transition hover:bg-lime-300"
+              className="inline-flex items-center gap-2 bg-lime-400 px-6 py-3 text-xs font-semibold font-AppFont uppercase tracking-wide text-black transition hover:bg-lime-300"
             >
               ← Назад к списку
             </Link>
@@ -497,7 +506,10 @@ const ServiceDetailsPage: React.FC = () => {
       </section>
 
       {lightboxIndex !== null && gallery[lightboxIndex] && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90" onClick={closeLightbox}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+          onClick={closeLightbox}
+        >
           <div className="pointer-events-none absolute left-4 right-4 top-4 flex items-center justify-between text-xs text-white/80">
             <span className="pointer-events-auto rounded-full bg-black/60 px-3 py-1">
               {lightboxIndex + 1} / {gallery.length}
@@ -540,7 +552,10 @@ const ServiceDetailsPage: React.FC = () => {
             ›
           </button>
 
-          <div className="flex max-h-[92vh] max-w-[92vw] items-center justify-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex max-h-[92vh] max-w-[92vw] items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={gallery[lightboxIndex].src}
               alt={gallery[lightboxIndex].alt}

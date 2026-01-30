@@ -19,7 +19,7 @@ const AboutSection: React.FC = () => {
 
             <p className="mb-4 text-sm text-gray-800">Наши преимущества:</p>
 
-            <div className="space-y-3 text-sm leading-relaxed text-gray-700">
+            <div className="space-y-3 text-sm leading-relaxed text-gray-700 font-AppFont">
               <p>
                 Индивидуальный подход: Мы разработаем проект, учитывающий ваши пожелания и бюджет.
               </p>
@@ -44,7 +44,7 @@ const AboutSection: React.FC = () => {
             <div className="mt-8 flex flex-wrap gap-4">
               <button
                 type="button"
-                className="bg-lime-400 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
+                className="bg-lime-400 px-8 py-3 text-sm font-semibold font-AppFont uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
                 onClick={() => openAction('callback')}
               >
                 Оставить заявку
@@ -52,7 +52,7 @@ const AboutSection: React.FC = () => {
               <Link
                 to="/company"
                 type="button"
-                className="bg-lime-400 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
+                className="bg-lime-400 px-8 py-3 text-sm font-semibold font-AppFont uppercase tracking-wide text-black shadow-md transition hover:bg-lime-300"
               >
                 Подробности
               </Link>

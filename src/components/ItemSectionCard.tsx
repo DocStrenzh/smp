@@ -1,6 +1,6 @@
-import React from 'react';
-import {BuildItem} from "../constants/item_section";
-import {Link} from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
+import type { BuildItem } from "../constants/item_section";
 
 type BuildCardProps = {
   item: BuildItem;
@@ -8,7 +8,10 @@ type BuildCardProps = {
 
 const ItemSectionCard: React.FC<BuildCardProps> = ({ item }) => {
   return (
-    <Link to={`/services/${item.slug}`} className="group relative h-[220px] sm:h-[260px] md:h-[280px] cursor-pointer overflow-hidden bg-gray-200 shadow-sm">
+    <Link
+      to={`/services/${item.slug}`}
+      className="group relative h-[220px] sm:h-[260px] md:h-[280px] cursor-pointer overflow-hidden bg-gray-200 shadow-sm"
+    >
       <img
         src={item.image}
         alt={item.title}

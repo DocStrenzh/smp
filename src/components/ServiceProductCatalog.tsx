@@ -106,7 +106,7 @@ const ServiceProductsCatalog: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => onConsult(p)}
-                  className="w-full rounded-xl bg-lime-500 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-black transition hover:bg-lime-600"
+                  className="w-full rounded-xl bg-lime-500 px-4 py-2 text-xs font-semibold font-AppFont uppercase tracking-wide text-black transition hover:bg-lime-600"
                 >
                   Получить консультацию
                 </button>

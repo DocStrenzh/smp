@@ -39,7 +39,7 @@ const ServicesPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const { data } = await http.get<ApiSectionListResponse>("/sections/");
+        const { data } = await http.get<ApiSectionListResponse>("/sections");
 
         const mapped: ServiceItem[] = (data.items ?? []).map((s) => ({
           id: s.id,
@@ -51,11 +51,7 @@ const ServicesPage: React.FC = () => {
         if (mounted) setServices(mapped);
       } catch (e: any) {
         if (!mounted) return;
-        setError(
-          e?.response?.data?.message ||
-          e?.message ||
-          "Не удалось загрузить список услуг."
-        );
+        setError(e?.response?.data?.message || e?.message || "Не удалось загрузить список услуг.");
       } finally {
         if (mounted) setLoading(false);
       }

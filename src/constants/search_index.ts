@@ -1,6 +1,3 @@
-import { items } from "./item_section";
-import { serviceDetails } from "./serviceDetails";
-
 export type SearchIndexItem = {
   id: string;
   title: string;
@@ -10,22 +7,6 @@ export type SearchIndexItem = {
 };
 
 export const searchIndex: SearchIndexItem[] = [
-  ...items.map((s) => ({
-    id: `service-${s.id}`,
-    title: s.label,
-    url: `/services/${s.slug}`,
-    category: "Услуги",
-    text: s.title,
-  })),
-
-  ...serviceDetails.map((d, i) => ({
-    id: `service-detail-${i}`,
-    title: items.find((s) => s.slug === d.slug)?.label ?? "Услуга",
-    url: `/services/${d.slug}`,
-    category: "Услуги",
-    text: [...d.introParagraphs, ...(d.advantages ?? [])].join(" "),
-  })),
-
   {
     id: "company-about",
     title: "О компании",

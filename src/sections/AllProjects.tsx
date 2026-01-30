@@ -12,7 +12,8 @@ const AllProjects: React.FC = () => {
             right-4 
             -bottom-3 
             text-[12px] 
-            font-medium 
+            font-medium
+            font-AppFont
             text-lime-500 
             hover:text-gray-400 
             transition

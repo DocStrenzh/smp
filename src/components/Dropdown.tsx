@@ -27,12 +27,6 @@ const Dropdown: React.FC<DropdownProps> = ({ content }) => {
         <span className="text-[10px] sm:text-xs">▾</span>
       </button>
 
-      <button
-        type="button"
-        className="mt-1 block w-full text-[10px] sm:text-xs uppercase tracking-wide text-gray-500"
-      >
-        заказать звонок
-      </button>
 
       {isOpen && (
         <div
