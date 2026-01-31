@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import type { CatalogCategory } from "../constants/catalog";
-import {sidebarPromoImage} from "../constants/catalog";
+import type { CatalogCategory, CatalogSection } from "../api/catalogApi";
+import { useQuickActions } from "../components/QuickActionProvider";
 
 type Props = {
-  categories: CatalogCategory[];
+  categories: Array<CatalogCategory & { children?: CatalogSection[] }>;
 };
+
+const sidebarPromoImage = "/images/support.jpg";
 
 const CatalogSidebar: React.FC<Props> = ({ categories }) => {
   const { pathname, search } = useLocation();
+  const { openAction } = useQuickActions();
 
   const activeCategorySlug = useMemo(() => {
     const m = pathname.match(/^\/catalog\/([^/?#]+)/);
@@ -23,7 +26,7 @@ const CatalogSidebar: React.FC<Props> = ({ categories }) => {
 
   const sectionParam = useMemo(() => {
     const sp = new URLSearchParams(search);
-    return sp.get("section"); // string | null
+    return sp.get("section");
   }, [search]);
 
   return (
@@ -46,7 +49,6 @@ const CatalogSidebar: React.FC<Props> = ({ categories }) => {
                   <span className={["text-sm", isActive ? "text-neutral-900" : "text-neutral-800"].join(" ")}>
                     {cat.title}
                   </span>
-
                   <span className="text-neutral-400">{isOpen ? "▴" : "▾"}</span>
                 </button>
 
@@ -62,7 +64,7 @@ const CatalogSidebar: React.FC<Props> = ({ categories }) => {
                       Все в разделе
                     </Link>
 
-                    {cat.children?.map((sub) => {
+                    {(cat.children ?? []).map((sub) => {
                       const isSubActive = isActive && sectionParam === sub.slug;
 
                       return (
@@ -90,9 +92,7 @@ const CatalogSidebar: React.FC<Props> = ({ categories }) => {
         <div className="grid grid-cols-[1fr_120px] items-stretch bg-neutral-50">
           <div className="p-4">
             <div className="text-lg font-semibold text-neutral-900">Мы всегда на связи</div>
-            <div className="mt-1 text-sm text-neutral-600">
-              Рады будем ответить на любые ваши вопросы!
-            </div>
+            <div className="mt-1 text-sm text-neutral-600">Рады будем ответить на любые ваши вопросы!</div>
           </div>
 
           <div className="relative">
@@ -106,21 +106,36 @@ const CatalogSidebar: React.FC<Props> = ({ categories }) => {
         </div>
       </div>
 
-
       <div className="rounded-xl border bg-white">
-        <button className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50">
+        <button
+          type="button"
+          onClick={() => openAction("callback")}
+          className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50"
+        >
           <span className="text-neutral-400">📞</span> Заказать звонок
         </button>
         <div className="h-px bg-neutral-200" />
-        <button className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50">
+        <button
+          type="button"
+          onClick={() => openAction("question")}
+          className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50"
+        >
           <span className="text-neutral-400">✉️</span> Написать сообщение
         </button>
         <div className="h-px bg-neutral-200" />
-        <button className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50">
+        <button
+          type="button"
+          onClick={() => openAction("review")}
+          className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50"
+        >
           <span className="text-neutral-400">💬</span> Оставить отзыв
         </button>
         <div className="h-px bg-neutral-200" />
-        <button className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50">
+        <button
+          type="button"
+          onClick={() => openAction("map")}
+          className="flex w-full items-center gap-3 px-4 py-4 text-sm text-neutral-800 hover:bg-neutral-50"
+        >
           <span className="text-neutral-400">📍</span> Ближайшая студия
         </button>
       </div>

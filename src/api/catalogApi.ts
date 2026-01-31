@@ -12,6 +12,8 @@ export type CatalogSection = {
   slug: string;
   title: string;
   image?: string;
+
+  // связь с категорией
   categorySlug?: string;
   categoryId?: string;
 };
@@ -33,7 +35,7 @@ export type CatalogProduct = {
   sectionSlug?: string;
   sectionId?: string;
 
-  badges?: Array<"hit" | "new" | "sale" | "eco">;
+  badges?: string[];
 };
 
 type ListResp<T> = T[] | { data: T[] };
@@ -57,7 +59,8 @@ function mapCategory(raw: any): CatalogCategory {
   const id = s(raw.id || raw.ID || raw._id);
   const slug = s(raw.slug || raw.code || raw.key || raw.categorySlug);
   const title = s(raw.title || raw.name || raw.label);
-  const image = raw.image || raw.img || raw.icon || undefined;
+
+  const image = raw.imagePath || raw.image || raw.img || raw.icon || undefined;
 
   return {
     id: id || slug || title,
@@ -71,9 +74,16 @@ function mapSection(raw: any): CatalogSection {
   const id = s(raw.id || raw.ID || raw._id);
   const slug = s(raw.slug || raw.code || raw.key || raw.sectionSlug);
   const title = s(raw.title || raw.name || raw.label);
-  const image = raw.image || raw.img || raw.icon || undefined;
 
-  const categorySlug = raw.categorySlug || raw.category_slug || raw.category || undefined;
+  const image = raw.imagePath || raw.image || raw.img || raw.icon || undefined;
+
+  const categorySlug =
+    raw.parentCategorySlug ||
+    raw.categorySlug ||
+    raw.category_slug ||
+    raw.category ||
+    undefined;
+
   const categoryId = raw.categoryId || raw.category_id || undefined;
 
   return {
@@ -91,30 +101,41 @@ function mapProduct(raw: any): CatalogProduct {
   const title = s(raw.title || raw.name || raw.label);
 
   const price = n(raw.price ?? raw.currentPrice ?? raw.cost ?? 0, 0);
-  const oldPrice = raw.oldPrice ?? raw.old_price ?? raw.prevPrice ?? undefined;
-  const salePercent = raw.salePercent ?? raw.sale_percent ?? raw.discountPercent ?? undefined;
+
+  const oldPriceRaw = raw.oldPrice ?? raw.old_price ?? raw.prevPrice ?? undefined;
+  const salePercentRaw = raw.salePercent ?? raw.sale_percent ?? raw.discountPercent ?? undefined;
 
   const inStock = b(raw.inStock ?? raw.in_stock ?? raw.available ?? true, true);
 
-  const image = raw.image || raw.img || raw.photo || raw.picture || undefined;
+  const image =
+    raw.imagePath ||
+    raw.image ||
+    raw.img ||
+    raw.photo ||
+    raw.picture ||
+    undefined;
 
   const brand = s(raw.brand || raw.vendor || raw.manufacturer || "—");
   const type = s(raw.type || raw.kind || raw.productType || "—");
 
-  const categorySlug = raw.categorySlug || raw.category_slug || raw.category || undefined;
+  const categorySlug =
+    raw.categorySlug || raw.category_slug || raw.category || undefined;
   const categoryId = raw.categoryId || raw.category_id || undefined;
 
-  const sectionSlug = raw.sectionSlug || raw.section_slug || raw.section || undefined;
+  const sectionSlug =
+    raw.sectionSlug || raw.section_slug || raw.section || undefined;
   const sectionId = raw.sectionId || raw.section_id || undefined;
 
-  const badges = Array.isArray(raw.badges) ? raw.badges : undefined;
+  const badges = Array.isArray(raw.badges)
+    ? raw.badges.map((x: any) => s(x)).filter(Boolean)
+    : undefined;
 
   return {
     id: id || title,
     title: title || id,
     price,
-    oldPrice: oldPrice != null ? n(oldPrice, undefined as any) : undefined,
-    salePercent: salePercent != null ? n(salePercent, undefined as any) : undefined,
+    oldPrice: oldPriceRaw != null ? n(oldPriceRaw, undefined as any) : undefined,
+    salePercent: salePercentRaw != null ? n(salePercentRaw, undefined as any) : undefined,
     inStock,
     image,
     brand,

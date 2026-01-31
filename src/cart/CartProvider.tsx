@@ -11,7 +11,7 @@ type CartContextValue = {
   setQty: (productId: string, qty: number) => void;
   clear: () => void;
 
-  count: number; // суммарное кол-во
+  count: number;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);

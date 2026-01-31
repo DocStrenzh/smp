@@ -9,7 +9,6 @@ type CatalogContextValue = {
   sections: CatalogSection[];
   products: CatalogProduct[];
 
-  // удобные производные
   categoriesWithChildren: Array<CatalogCategory & { children: CatalogSection[] }>;
   getCategoryBySlug: (slug: string) => CatalogCategory | undefined;
   getSectionsByCategorySlug: (slug: string) => CatalogSection[];
@@ -54,35 +53,27 @@ export const CatalogProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const categoriesWithChildren = useMemo(() => {
-    const bySlug = new Map(categories.map((c) => [c.slug, c]));
-    const byId = new Map(categories.map((c) => [c.id, c]));
-
     const childrenMap = new Map<string, CatalogSection[]>();
-    for (const s of sections) {
-      const cat =
-        (s.categorySlug && bySlug.get(s.categorySlug)) ||
-        (s.categoryId && byId.get(s.categoryId));
 
-      if (!cat) continue;
-      const key = cat.id;
-      const arr = childrenMap.get(key) ?? [];
+    for (const s of sections) {
+      const slug = s.categorySlug;
+      if (!slug) continue;
+
+      const arr = childrenMap.get(slug) ?? [];
       arr.push(s);
-      childrenMap.set(key, arr);
+      childrenMap.set(slug, arr);
     }
 
     return categories.map((c) => ({
       ...c,
-      children: childrenMap.get(c.id) ?? [],
+      children: (childrenMap.get(c.slug) ?? []).slice().sort((a, b) => a.title.localeCompare(b.title, "ru")),
     }));
   }, [categories, sections]);
 
   const getCategoryBySlug = (slug: string) => categories.find((c) => c.slug === slug);
 
-  const getSectionsByCategorySlug = (slug: string) => {
-    const cat = getCategoryBySlug(slug);
-    if (!cat) return [];
-    return categoriesWithChildren.find((c) => c.id === cat.id)?.children ?? [];
-  };
+  const getSectionsByCategorySlug = (slug: string) =>
+    categoriesWithChildren.find((c) => c.slug === slug)?.children ?? [];
 
   const getProductsByCategorySlug = (slug: string) =>
     products.filter((p) => p.categorySlug === slug);

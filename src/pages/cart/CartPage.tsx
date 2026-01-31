@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import EmptyCart from "./EmptyCart";
 import { useCart } from "../../cart/CartProvider";
 import { useCatalog } from "../../catalog/CatalogProvider";
@@ -62,7 +63,6 @@ const CartPage: React.FC = () => {
   }, [lines]);
 
   const hasItems = items.length > 0;
-
   const formatRub = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -117,7 +117,19 @@ const CartPage: React.FC = () => {
         <div className="mb-6 text-xs text-gray-400">
           Главная <span className="mx-1">/</span> Корзина
         </div>
-        <h1 className="mb-10 text-3xl font-semibold text-gray-900">Корзина</h1>
+
+        <div className="mb-10 flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-semibold text-gray-900">Корзина</h1>
+
+          {/* ✅ на всякий случай дублируем */}
+          <Link
+            to="/catalog"
+            className="inline-flex h-10 items-center justify-center border border-gray-200 bg-white px-5 text-xs font-semibold uppercase tracking-wide text-gray-900 hover:bg-gray-50"
+          >
+            В каталог
+          </Link>
+        </div>
+
         <EmptyCart />
       </div>
     );
@@ -129,7 +141,18 @@ const CartPage: React.FC = () => {
         <div className="mb-6 text-xs text-gray-400">
           Главная <span className="mx-1">/</span> Корзина
         </div>
-        <h1 className="mb-10 text-3xl font-semibold text-gray-900">Корзина</h1>
+
+        <div className="mb-10 flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-semibold text-gray-900">Корзина</h1>
+
+          <Link
+            to="/catalog"
+            className="inline-flex h-10 items-center justify-center border border-gray-200 bg-white px-5 text-xs font-semibold uppercase tracking-wide text-gray-900 hover:bg-gray-50"
+          >
+            В каталог
+          </Link>
+        </div>
+
         <div className="text-sm text-neutral-600">Загрузка товаров...</div>
       </div>
     );
@@ -141,19 +164,38 @@ const CartPage: React.FC = () => {
         <div className="mb-6 text-xs text-gray-400">
           Главная <span className="mx-1">/</span> Корзина
         </div>
-        <h1 className="mb-10 text-3xl font-semibold text-gray-900">Корзина</h1>
+
+        <div className="mb-10 flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-semibold text-gray-900">Корзина</h1>
+
+          <Link
+            to="/catalog"
+            className="inline-flex h-10 items-center justify-center border border-gray-200 bg-white px-5 text-xs font-semibold uppercase tracking-wide text-gray-900 hover:bg-gray-50"
+          >
+            В каталог
+          </Link>
+        </div>
 
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           Не удалось загрузить каталог: {catalogError}
         </div>
 
-        <button
-          type="button"
-          onClick={clear}
-          className="mt-6 h-12 w-52 bg-lime-400 text-xs font-semibold uppercase tracking-wide text-black hover:bg-lime-300"
-        >
-          Очистить корзину
-        </button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={clear}
+            className="h-12 w-52 bg-lime-400 text-xs font-semibold uppercase tracking-wide text-black hover:bg-lime-300"
+          >
+            Очистить корзину
+          </button>
+
+          <Link
+            to="/catalog"
+            className="inline-flex h-12 w-52 items-center justify-center border border-gray-200 bg-white text-xs font-semibold uppercase tracking-wide text-gray-900 hover:bg-gray-50"
+          >
+            В каталог
+          </Link>
+        </div>
       </div>
     );
   }
@@ -166,7 +208,27 @@ const CartPage: React.FC = () => {
         Главная <span className="mx-1">/</span> Корзина
       </div>
 
-      <h1 className="mb-10 text-3xl font-semibold text-gray-900">Корзина</h1>
+      {/* ✅ шапка с переходом в каталог всегда */}
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-3xl font-semibold text-gray-900">Корзина</h1>
+
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/catalog"
+            className="inline-flex h-10 items-center justify-center border border-gray-200 bg-white px-5 text-xs font-semibold uppercase tracking-wide text-gray-900 hover:bg-gray-50"
+          >
+            В каталог
+          </Link>
+
+          <button
+            type="button"
+            onClick={clear}
+            className="inline-flex h-10 items-center justify-center bg-lime-400 px-5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-lime-300"
+          >
+            Очистить
+          </button>
+        </div>
+      </div>
 
       {missingCount > 0 && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -372,6 +434,15 @@ const CartPage: React.FC = () => {
               <div className="rounded bg-lime-400 px-3 py-1 text-sm font-semibold text-black">
                 {formatRub(totals.savings)}
               </div>
+            </div>
+
+            <div className="mt-6">
+              <Link
+                to="/catalog"
+                className="inline-flex h-11 w-full items-center justify-center border border-gray-200 bg-white text-xs font-semibold uppercase tracking-wide text-gray-900 hover:bg-gray-50"
+              >
+                Вернуться в каталог
+              </Link>
             </div>
           </div>
         </aside>
