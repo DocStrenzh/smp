@@ -19,7 +19,7 @@ const AllProjects: React.FC = () => {
             transition
           "
         >
-          ВСЕ ПРОЕКТЫ
+          ВСЕ ПРОЕКТЫ.
         </a>
 
       </div>
