@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_HOST = process.env.REACT_APP_API_HOST ?? "localhost";
+const API_HOST = process.env.REACT_APP_API_DOMAIN ?? "localhost";
 const API_PORT = process.env.REACT_APP_API_PORT ?? "80";
 const API_PREFIX = process.env.REACT_APP_API_PREFIX ?? "/api/v1";
 
